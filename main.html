@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>AwayFromTheTruth</title>
+<title>CRT Access Terminal</title>
 <style>
   :root{
     --bg:#000a00;
@@ -11,7 +11,6 @@
     --muted:#4a8b4a;
     --glow:rgba(124,255,124,0.1);
   }
-
   html,body{
     height:100%;
     margin:0;
@@ -22,7 +21,6 @@
     align-items:center;
     justify-content:center;
   }
-
   .screen{
     width:90%;
     max-width:800px;
@@ -34,17 +32,14 @@
     overflow:hidden;
     box-shadow:0 0 40px black,0 0 60px rgba(0,255,0,0.05) inset;
   }
-
-  h1{font-size:28px;margin-top:0;text-shadow:0 0 8px var(--glow);text-align:center;}
+  h1{text-align:center;font-size:28px;margin-top:0;text-shadow:0 0 8px var(--glow);}
   p.lead{text-align:center;color:var(--muted);font-size:14px;}
-
   form{
     display:flex;
     gap:10px;
     margin-top:20px;
     justify-content:center;
   }
-
   input{
     flex:1;
     max-width:300px;
@@ -57,7 +52,6 @@
     outline:none;
     text-align:center;
   }
-
   button{
     background:linear-gradient(#0b3,#074);
     color:#001;
@@ -67,7 +61,6 @@
     cursor:pointer;
     font-weight:bold;
   }
-
   .panel{
     margin-top:20px;
     background:rgba(0,0,0,0.2);
@@ -77,13 +70,7 @@
     min-height:70px;
     text-align:center;
   }
-
-  .status{
-    color:var(--muted);
-    font-size:14px;
-    margin-bottom:8px;
-  }
-
+  .status{color:var(--muted);font-size:14px;margin-bottom:8px;}
   .secret{
     font-size:14px;
     white-space:pre-wrap;
@@ -103,7 +90,6 @@
     opacity:0.8;
   }
   @keyframes scan{from{background-position-y:0;}to{background-position-y:6px;}}
-
   .screen::after{
     content:"";position:absolute;inset:0;
     background:repeating-linear-gradient(90deg,rgba(255,255,255,0.02) 0 1px,transparent 1px 12px);
@@ -116,7 +102,7 @@
 <body>
   <div class="screen">
     <h1>ACCESS TERMINAL</h1>
-    <p class="lead">Enter the access key to seek the truth</p>
+    <p class="lead">Enter the acces key to seek the truth</p>
 
     <form id="form" autocomplete="off">
       <input id="pw" type="text" placeholder="Enter password here." aria-label="password" />
@@ -131,9 +117,27 @@
 
 <script>
 (async function(){
-  const PASSWORD_HASH = "106a5842fc5fce6f663176285ed1516dbb1e3d15c05abab12fdca46d60b539b7";
-
-  const SECRET_ENCODED = "QXMgSSB3YXMgaGFuZ2luZyBhcm91bmQgd2l0aCBWaWFtIFJlY3RhbSAmIENocm9ub3MsIEkgc3VkZGVubHkgZmVsdCBteSBwaG9uZSBidXp6LiBJVCB3YXMgbWVzc2FnaW5nIG1lLiBJVCBhc2tlZCAiRDAgWTBVIFwvXC9ATlQgVDAgTTMzVD8iLgpJIHdhcyB0b28gc2NhcmVkIHRvIHJlcGx5Lg==";
+  const PASSWORDS = [
+    {
+      //H
+      hash: "106a5842fc5fce6f663176285ed1516dbb1e3d15c05abab12fdca46d60b539b7",
+      message: "QXMgSSB3YXMgaGFuZ2luZyBhcm91bmQgd2l0aCBWaWFtIFJlY3RhbSAmIENocm9ub3MsIEkgc3VkZGVubHkgZmVsdCBteSBwaG9uZSBidXp6LiBJVCB3YXMgbWVzc2FnaW5nIG1lLiBJVCBhc2tlZCAiRDAgWTBVIFwvXC9ATlQgVDAgTTMzVD8iLgpJIHdhcyB0b28gc2NhcmVkIHRvIHJlcGx5Lg=="
+    },
+    {
+      //C
+      hash: "de6b92fe6505479a6fd06d65a22d227281f251d52f0ae28f662e89bbf54f64cc",
+      message: "VHlwZSBpbiAiU2VlLiIu"
+    },
+    {
+      //C
+      hash: "781cc6aaed5ad60b607037c032d73bffe65925bc17c2a2e99f29aa79297c560f",
+      message: "V2VsbCBJIFNFRSB5b3Ugbm93IGtub3cgaG93IHRvIHVzZSB0aGlzIHdlYnNpdGUgb2YgbWluZS4gTm93IGRlY29kZSB0aGUgaW1hZ2UgSSBwb3N0ZWQgKHRoZSBvbmUgd2l0aCB0aGUgbW9uaXRvciAmIGNyeXB0aWMgdGV4dCkuIEkgYWxzbyByZWNvbW1lbmQgY29tcGFyaW5nIG15IHZpZGVvICh0aGUgb25lIHdpdGggTVkgQ1lQSEVSKSAmIGNvbXBhcmUgaXQgd2l0aCBseXJpY3Mgb2YgdGhlIHNvbmcgaW4gdGhlIGJhY2tncm91bmQh"
+    },
+    // {
+    //   hash: 
+    //   message: 
+    // }
+  ];
 
   const form = document.getElementById('form');
   const input = document.getElementById('pw');
@@ -156,10 +160,11 @@
     secret.style.display = "none";
 
     const enteredHash = await sha256Hex(val);
-    if(enteredHash === PASSWORD_HASH){
+    const match = PASSWORDS.find(p => p.hash === enteredHash);
+
+    if(match){
       status.textContent = "ACCESS GRANTED — revealing message:";
-      const decoded = atob(SECRET_ENCODED);
-      secret.textContent = decoded;
+      secret.textContent = atob(match.message);
       secret.style.display = "block";
     }else{
       status.textContent = "ACCESS DENIED.";
@@ -167,7 +172,6 @@
 
     input.value = "";
   });
-
 })();
 </script>
 </body>
