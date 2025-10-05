@@ -104,12 +104,14 @@ fetch('https://api.ipify.org?format=json')
   .then(d=>{ myIP=d.ip; statusEl.textContent=`Your IP: ${myIP}`; loadMessages(); })
   .catch(()=>statusEl.textContent='Failed to detect IP');
 
-async function loadMessages(){
+let lastMessagesLength = 0; // Track the number of messages loaded
+
+async function loadMessages(scrollToBottom = true){
   const res = await fetch(API_URL);
   const data = await res.json();
   const allMessages = data.record || [];
   messagesEl.innerHTML='';
-  
+
   allMessages.forEach(m=>{
     const div = document.createElement('div');
     if(m.ip===specialIP) div.className='message special';
@@ -130,7 +132,12 @@ async function loadMessages(){
 
     messagesEl.appendChild(div);
   });
-  messagesEl.scrollTop = messagesEl.scrollHeight;
+
+  // Scroll only if new messages are added
+  if(scrollToBottom && allMessages.length > lastMessagesLength){
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+  lastMessagesLength = allMessages.length;
 }
 
 async function sendMessage(text){
@@ -148,7 +155,7 @@ async function sendMessage(text){
   });
 
   if(myIP!==specialIP){ dailyCount++; localStorage.setItem('dailyCount', dailyCount); }
-  loadMessages();
+  loadMessages(true); // Scroll after sending
 }
 
 form.addEventListener('submit', e=>{
@@ -159,7 +166,6 @@ form.addEventListener('submit', e=>{
   input.value='';
 });
 
-setInterval(loadMessages, 5000);
+// Remove automatic refresh interval
+// setInterval(loadMessages, 5000);
 </script>
-</body>
-</html>
