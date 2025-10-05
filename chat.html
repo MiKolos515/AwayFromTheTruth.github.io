@@ -104,7 +104,7 @@ fetch('https://api.ipify.org?format=json')
   .then(d=>{ myIP=d.ip; statusEl.textContent=`Your IP: ${myIP}`; loadMessages(); })
   .catch(()=>statusEl.textContent='Failed to detect IP');
 
-let lastMessagesLength = 0; // Track the number of messages loaded
+let lastMessagesLength = 0;
 
 async function loadMessages(scrollToBottom = true){
   const res = await fetch(API_URL);
@@ -133,7 +133,6 @@ async function loadMessages(scrollToBottom = true){
     messagesEl.appendChild(div);
   });
 
-  // Scroll only if new messages are added
   if(scrollToBottom && allMessages.length > lastMessagesLength){
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
@@ -155,7 +154,7 @@ async function sendMessage(text){
   });
 
   if(myIP!==specialIP){ dailyCount++; localStorage.setItem('dailyCount', dailyCount); }
-  loadMessages(true); // Scroll after sending
+  loadMessages(true);
 }
 
 form.addEventListener('submit', e=>{
@@ -166,6 +165,14 @@ form.addEventListener('submit', e=>{
   input.value='';
 });
 
-// Remove automatic refresh interval
-// setInterval(loadMessages, 5000);
+// Auto-refresh every 2~5 seconds without forcing scroll
+function autoRefresh(){
+  const nearBottom = messagesEl.scrollTop + messagesEl.clientHeight >= messagesEl.scrollHeight - 50;
+  loadMessages(nearBottom);
+  setTimeout(autoRefresh, 2000 + Math.random()*3000);
+}
+autoRefresh();
+
 </script>
+</body>
+</html>
