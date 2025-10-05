@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Public Chat</title>
+<title>PublicChat</title>
 <style>
 :root{
   --bg:#000a00;
@@ -34,8 +34,8 @@ button{background:linear-gradient(#0b3,#074);color:#001;border:0;border-radius:4
 </head>
 <body>
 <div class="screen">
-  <h1>💬 Public Chat</h1>
-  <p class="lead">You can send 2 messages per day per IP</p>
+  <h1>Public Chat</h1>
+  <p class="lead">You can only send 2 messages per day!</p>
   <div class="messages" id="messages"></div>
   <form id="chatForm">
     <input type="text" id="messageInput" placeholder="Type your message..." required maxlength="200"/>
@@ -45,13 +45,12 @@ button{background:linear-gradient(#0b3,#074);color:#001;border:0;border-radius:4
 </div>
 
 <script>
-const BIN_ID = "68e236d043b1c97be95ae895"; // replace with your public bin ID
+const BIN_ID = "68e23b19ae596e708f06a33a";
 const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
 const POST_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 let myIP = null;
 const maxMessagesPerDay = 2;
 
-// Special IP
 const specialIP = "88.156.230.75";
 
 const messagesEl = document.getElementById('messages');
@@ -59,7 +58,6 @@ const statusEl = document.getElementById('status');
 const form = document.getElementById('chatForm');
 const input = document.getElementById('messageInput');
 
-// Track daily usage
 const today = new Date().toDateString();
 if(localStorage.getItem('lastReset') !== today){
   localStorage.setItem('lastReset', today);
@@ -67,13 +65,11 @@ if(localStorage.getItem('lastReset') !== today){
 }
 let dailyCount = parseInt(localStorage.getItem('dailyCount')) || 0;
 
-// Get IP
 fetch('https://api.ipify.org?format=json')
   .then(r=>r.json())
   .then(d=>{ myIP=d.ip; statusEl.textContent=`Your IP: ${myIP}`; loadMessages(); })
   .catch(()=>statusEl.textContent='Failed to detect IP');
 
-// Load messages
 async function loadMessages(){
   const res = await fetch(API_URL);
   const data = await res.json();
@@ -90,17 +86,14 @@ async function loadMessages(){
   messagesEl.scrollTop=messagesEl.scrollHeight;
 }
 
-// Send message
 async function sendMessage(text){
   if(myIP!==specialIP && dailyCount>=maxMessagesPerDay){ alert("Daily limit reached"); return; }
 
-  // Fetch latest messages
   const res = await fetch(API_URL);
   const data = await res.json();
   const allMessages = data.record || [];
   allMessages.push({ ip: myIP || "unknown", text, time: Date.now() });
 
-  // Update bin (public write)
   await fetch(POST_URL, {
     method:"PUT",
     headers: { "Content-Type": "application/json" },
@@ -111,7 +104,6 @@ async function sendMessage(text){
   loadMessages();
 }
 
-// Form submit
 form.addEventListener('submit', e=>{
   e.preventDefault();
   const text=input.value.trim();
@@ -120,8 +112,8 @@ form.addEventListener('submit', e=>{
   input.value='';
 });
 
-// Auto-refresh
 setInterval(loadMessages, 5000);
 </script>
 </body>
 </html>
+
