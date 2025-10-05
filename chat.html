@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>PublicChat</title>
+<link rel="icon" type="image/png" href="https://63271f9dcf.cbaul-cdnwnd.com/c4628d49dde770784d90b342fc5f5b50/200000020-cc1cdcc1cf/Untitled15_20251005202137.png">
 <style>
 :root{
   --bg:#000a00;
@@ -25,24 +26,6 @@ html,body{
   border-radius:8px;position:relative;overflow:hidden;
   box-shadow:0 0 40px black,0 0 60px rgba(0,255,0,0.05) inset;
 }
-.screen::before{
-  content:"";position:absolute;inset:0;
-  background:linear-gradient(transparent 85%,rgba(0,0,0,0.15) 86%);
-  background-size:100% 6px;
-  animation:scan 3s linear infinite;
-  mix-blend-mode:overlay;
-  pointer-events:none;
-  opacity:0.8;
-}
-@keyframes scan{from{background-position-y:0;}to{background-position-y:6px;}}
-.screen::after{
-  content:"";position:absolute;inset:0;
-  background:repeating-linear-gradient(90deg,rgba(255,255,255,0.02) 0 1px,transparent 1px 12px);
-  animation:stripes 6s linear infinite;
-  opacity:0.05;pointer-events:none;
-}
-@keyframes stripes{from{transform:translateX(0);}to{transform:translateX(-40px);}}
-
 h1{text-align:center;font-size:28px;margin-top:0;text-shadow:0 0 8px var(--glow);}
 p.lead{text-align:center;color:var(--muted);font-size:14px;}
 form{display:flex;gap:10px;margin-top:20px;justify-content:center;}
@@ -61,10 +44,14 @@ button{background:linear-gradient(#0b3,#074);color:#001;border:0;border-radius:4
   margin-top:4px;
   box-sizing:border-box; 
 }
-.message a{
-  display:block;         
+.timestamp {
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  margin: 5px 0;
+  opacity: 0.8;
 }
-.status{color:var(--muted);font-size:14px;margin-top:10px;text-align:center;}
+
 </style>
 </head>
 <body>
@@ -101,10 +88,23 @@ let dailyCount = parseInt(localStorage.getItem('dailyCount')) || 0;
 
 fetch('https://api.ipify.org?format=json')
   .then(r=>r.json())
-  .then(d=>{ myIP=d.ip; statusEl.textContent=`Your IP: ${myIP}`; loadMessages(); })
+  .then(d=>{ myIP=d.ip; statusEl.textContent=``; loadMessages(); })
   .catch(()=>statusEl.textContent='Failed to detect IP');
 
 let lastMessagesLength = 0;
+
+function formatDate(date){
+  const day = String(date.getDate()).padStart(2,'0');
+  const month = date.toLocaleString('en-US', { month: 'long' });
+  const year = date.getFullYear();
+  return `${day} ${month} ${year}`;
+}
+
+function formatTime(date){
+  const h = String(date.getHours()).padStart(2,'0');
+  const m = String(date.getMinutes()).padStart(2,'0');
+  return `${h}:${m}`;
+}
 
 async function loadMessages(scrollToBottom = true){
   const res = await fetch(API_URL);
@@ -112,7 +112,34 @@ async function loadMessages(scrollToBottom = true){
   const allMessages = data.record || [];
   messagesEl.innerHTML='';
 
+  let lastDate = null;
+  let lastMinute = null;
+
   allMessages.forEach(m=>{
+    const msgTime = new Date(m.time || 0);
+    const msgDateStr = formatDate(msgTime);
+    const msgMinuteStr = formatTime(msgTime);
+
+    // Date separator
+    if(lastDate !== msgDateStr){
+      const dateDiv = document.createElement('div');
+      dateDiv.className = 'timestamp';
+      dateDiv.textContent = msgDateStr;
+      messagesEl.appendChild(dateDiv);
+      lastDate = msgDateStr;
+      lastMinute = null;
+    }
+
+    // Time separator
+    if(lastMinute !== msgMinuteStr){
+      const timeDiv = document.createElement('div');
+      timeDiv.className = 'timestamp';
+      timeDiv.textContent = msgMinuteStr;
+      messagesEl.appendChild(timeDiv);
+      lastMinute = msgMinuteStr;
+    }
+
+    // Message
     const div = document.createElement('div');
     if(m.ip===specialIP) div.className='message special';
     else if(m.ip===myIP) div.className='message mine';
@@ -165,14 +192,8 @@ form.addEventListener('submit', e=>{
   input.value='';
 });
 
-// Auto-refresh every 2~5 seconds without forcing scroll
-function autoRefresh(){
-  const nearBottom = messagesEl.scrollTop + messagesEl.clientHeight >= messagesEl.scrollHeight - 50;
-  loadMessages(nearBottom);
-  setTimeout(autoRefresh, 2000 + Math.random()*3000);
-}
-autoRefresh();
-
+// Refresh every 3 seconds without forcing scroll
+setInterval(()=>loadMessages(false), 3000);
 </script>
 </body>
 </html>
