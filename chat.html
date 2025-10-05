@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PublicChat</title>
+<style>
+:root{
+  --bg:#000a00;
+  --text:#7CFF7C;
+  --muted:#4a8b4a;
+  --glow:rgba(124,255,124,0.1);
+}
+html,body{
+  height:100%;margin:0;
+  background:linear-gradient(#001200,#000800);
+  color:var(--text);
+  font-family:"VT323","Courier New",monospace;
+  display:flex;align-items:center;justify-content:center;
+}
+.screen{width:90%;max-width:800px;padding:2rem;border:4px solid rgba(10,40,10,0.7);background:linear-gradient(180deg,rgba(0,20,0,0.9),rgba(0,10,0,0.85));border-radius:8px;position:relative;overflow:hidden;box-shadow:0 0 40px black,0 0 60px rgba(0,255,0,0.05) inset;}
+h1{text-align:center;font-size:28px;margin-top:0;text-shadow:0 0 8px var(--glow);}
+p.lead{text-align:center;color:var(--muted);font-size:14px;}
+form{display:flex;gap:10px;margin-top:20px;justify-content:center;}
+input{flex:1;max-width:300px;background:transparent;border:1px solid rgba(124,255,124,0.1);padding:10px;border-radius:4px;color:var(--text);font-size:16px;outline:none;text-align:center;}
+button{background:linear-gradient(#0b3,#074);color:#001;border:0;border-radius:4px;padding:10px 14px;cursor:pointer;font-weight:bold;}
+.messages{margin-top:20px;display:flex;flex-direction:column;gap:10px;max-height:300px;overflow-y:auto;padding-right:5px;}
+.message{max-width:70%;padding:8px 12px;border-radius:6px;border:1px solid rgba(124,255,124,0.1);background:rgba(0,30,0,0.4);word-break:break-word;}
+.mine{align-self:flex-start;background:rgba(100,255,100,0.2);border-color:rgba(124,255,124,0.5);color:#B8FFB8;font-weight:bold;}
+.other{align-self:flex-end;opacity:0.7;}
+.special{border:2px solid rgb(59, 4, 61);box-shadow:0 0 10px rgb(59, 4, 61);font-weight:bold;}
+.status{color:var(--muted);font-size:14px;margin-top:10px;text-align:center;}
+</style>
+</head>
+<body>
+<div class="screen">
+  <h1>Public Chat</h1>
+  <p class="lead">You can only send 2 messages per day!</p>
+  <div class="messages" id="messages"></div>
+  <form id="chatForm">
+    <input type="text" id="messageInput" placeholder="Type your message..." required maxlength="200"/>
+    <button type="submit">Send</button>
+  </form>
+  <div class="status" id="status"></div>
+</div>
+
+<script>
+const BIN_ID = "68e23be843b1c97be95aeceb";
+const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
+const POST_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+let myIP = null;
+const maxMessagesPerDay = 2;
+
+const specialIP = "88.156.230.75";
+
+const messagesEl = document.getElementById('messages');
+const statusEl = document.getElementById('status');
+const form = document.getElementById('chatForm');
+const input = document.getElementById('messageInput');
+
+const today = new Date().toDateString();
+if(localStorage.getItem('lastReset') !== today){
+  localStorage.setItem('lastReset', today);
+  localStorage.setItem('dailyCount', '0');
+}
+let dailyCount = parseInt(localStorage.getItem('dailyCount')) || 0;
+
+fetch('https://api.ipify.org?format=json')
+  .then(r=>r.json())
+  .then(d=>{ myIP=d.ip; statusEl.textContent=`Your IP: ${myIP}`; loadMessages(); })
+  .catch(()=>statusEl.textContent='Failed to detect IP');
+
+async function loadMessages(){
+  const res = await fetch(API_URL);
+  const data = await res.json();
+  const allMessages = data.record || [];
+  messagesEl.innerHTML='';
+  allMessages.forEach(m=>{
+    const div=document.createElement('div');
+    if(m.ip===specialIP) div.className='message special';
+    else if(m.ip===myIP) div.className='message mine';
+    else div.className='message other';
+    div.textContent=m.text;
+    messagesEl.appendChild(div);
+  });
+  messagesEl.scrollTop=messagesEl.scrollHeight;
+}
+
+async function sendMessage(text){
+  if(myIP!==specialIP && dailyCount>=maxMessagesPerDay){ alert("Daily limit reached"); return; }
+
+  const res = await fetch(API_URL);
+  const data = await res.json();
+  const allMessages = data.record || [];
+  allMessages.push({ ip: myIP || "unknown", text, time: Date.now() });
+
+  await fetch(POST_URL, {
+    method:"PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(allMessages)
+  });
+
+  if(myIP!==specialIP){ dailyCount++; localStorage.setItem('dailyCount', dailyCount); }
+  loadMessages();
+}
+
+form.addEventListener('submit', e=>{
+  e.preventDefault();
+  const text=input.value.trim();
+  if(!text) return;
+  sendMessage(text);
+  input.value='';
+});
+
+setInterval(loadMessages, 5000);
+</script>
+</body>
+</html>
+
+
