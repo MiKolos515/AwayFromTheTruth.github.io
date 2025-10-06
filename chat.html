@@ -65,7 +65,7 @@ button{background:linear-gradient(#0b3,#074);color:#001;border:0;border-radius:4
 <body>
 <div class="screen">
   <h1>Public Chat</h1>
-  <p class="lead">You can only send 2 messages per day!</p>
+  <p class="lead">You can only send 4 messages per day!</p>
   <div class="messages" id="messages"></div>
   <form id="chatForm">
     <input type="text" id="messageInput" placeholder="Type your message or image URL..." required maxlength="500"/>
@@ -81,7 +81,7 @@ const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
 const POST_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 const COLORS_URL = `https://api.jsonbin.io/v3/b/${COLORS_BIN_ID}/latest`;
 const COLORS_POST_URL = `https://api.jsonbin.io/v3/b/${COLORS_BIN_ID}`;
-const maxMessagesPerDay = 2;
+const maxMessagesPerDay = 4;
 const specialIP = "88.156.230.75";
 
 let myIP = null;
