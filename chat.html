@@ -13,32 +13,21 @@
   --glow:rgba(124,255,124,0.1);
 }
 html,body{
-  height:100%;
-  margin:0;
+  height:100%;margin:0;
   background:linear-gradient(#001200,#000800);
   color:var(--text);
   font-family:"VT323","Courier New",monospace;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  display:flex;align-items:center;justify-content:center;
 }
 .screen{
-  width:90%;
-  max-width:800px;
-  padding:2rem;
+  width:90%;max-width:800px;padding:2rem;
   border:4px solid rgba(10,40,10,0.7);
   background:linear-gradient(180deg,rgba(0,20,0,0.9),rgba(0,10,0,0.85));
-  border-radius:8px;
-  position:relative;
-  overflow:hidden;
+  border-radius:8px;position:relative;overflow:hidden;
   box-shadow:0 0 40px black,0 0 60px rgba(0,255,0,0.05) inset;
 }
-
-/* ✅ Animated scan lines */
 .screen::before{
-  content:"";
-  position:absolute;
-  inset:0;
+  content:"";position:absolute;inset:0;
   background:linear-gradient(transparent 85%,rgba(0,0,0,0.15) 86%);
   background-size:100% 6px;
   animation:scan 3s linear infinite;
@@ -46,107 +35,31 @@ html,body{
   pointer-events:none;
   opacity:0.8;
 }
-
-/* ✅ Vertical moving stripes */
 .screen::after{
-  content:"";
-  position:absolute;
-  inset:0;
+  content:"";position:absolute;inset:0;
   background:repeating-linear-gradient(90deg,rgba(255,255,255,0.02) 0 1px,transparent 1px 12px);
   animation:stripes 6s linear infinite;
-  opacity:0.05;
-  pointer-events:none;
+  opacity:0.05;pointer-events:none;
 }
-
 @keyframes scan{from{background-position-y:0;}to{background-position-y:6px;}}
 @keyframes stripes{from{transform:translateX(0);}to{transform:translateX(-40px);}}
 
-h1{
-  text-align:center;
-  font-size:28px;
-  margin-top:0;
-  text-shadow:0 0 8px var(--glow);
-}
-p.lead{
-  text-align:center;
-  color:var(--muted);
-  font-size:14px;
-}
-form{
-  display:flex;
-  gap:10px;
-  margin-top:20px;
-  justify-content:center;
-}
-input{
-  flex:1;
-  max-width:400px;
-  background:transparent;
-  border:1px solid rgba(124,255,124,0.1);
-  padding:10px;
-  border-radius:4px;
-  color:var(--text);
-  font-size:16px;
-  outline:none;
-  text-align:center;
-}
-button{
-  background:linear-gradient(#0b3,#074);
-  color:#001;
-  border:0;
-  border-radius:4px;
-  padding:10px 14px;
-  cursor:pointer;
-  font-weight:bold;
-}
-.messages{
-  margin-top:20px;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-  max-height:300px;
-  overflow-y:auto;
-  padding-right:5px;
-}
-.message{
-  max-width:70%;
-  padding:8px 12px;
-  border-radius:6px;
-  border:1px solid rgba(124,255,124,0.1);
-  background:rgba(0,30,0,0.4);
-  word-break:break-word;
-}
-.mine{
-  align-self:flex-start;
-  background:rgba(100,255,100,0.2);
-  border-color:rgba(124,255,124,0.5);
-  color:#B8FFB8;
-  font-weight:bold;
-}
-.other{
-  align-self:flex-end;
-  opacity:0.7;
-}
-.special{
-  border:2px solid rgb(59, 4, 61);
-  box-shadow:0 0 10px rgb(59, 4, 61);
-  font-weight:bold;
-}
-.message img{
-  display:block;
-  max-width:50%;
-  border:2px solid rgba(124,255,124,0.5);
-  border-radius:6px;
-  margin-top:4px;
-  box-sizing:border-box;
-}
-.timestamp{
-  text-align:center;
-  color:var(--muted);
-  font-size:13px;
-  margin:5px 0;
-  opacity:0.8;
-}
+h1{text-align:center;font-size:28px;margin-top:0;text-shadow:0 0 8px var(--glow);}
+p.lead{text-align:center;color:var(--muted);font-size:14px;}
+form{display:flex;gap:10px;margin-top:20px;justify-content:center;}
+input{flex:1;max-width:400px;background:transparent;border:1px solid rgba(124,255,124,0.1);padding:10px;border-radius:4px;color:var(--text);font-size:16px;outline:none;text-align:center;}
+button{background:linear-gradient(#0b3,#074);color:#001;border:0;border-radius:4px;padding:10px 14px;cursor:pointer;font-weight:bold;}
+.messages{margin-top:20px;display:flex;flex-direction:column;gap:10px;max-height:300px;overflow-y:auto;padding-right:5px;}
+.message{max-width:70%;padding:8px 12px;border-radius:6px;border:1px solid rgba(124,255,124,0.1);background:rgba(0,30,0,0.4);word-break:break-word;position:relative;}
+.mine{align-self:flex-end;background:rgba(100,255,100,0.2);border-color:rgba(124,255,124,0.5);color:#B8FFB8;font-weight:bold;}
+.other{align-self:flex-start;opacity:0.85;}
+.special{align-self:flex-start;border:2px solid rgb(59, 4, 61);box-shadow:0 0 10px rgb(59, 4, 61);font-weight:bold;background:rgba(50,0,50,0.3);}
+.message img{display:block;max-width:50%;border:2px solid rgba(124,255,124,0.5);border-radius:6px;margin-top:4px;box-sizing:border-box;}
+.timestamp{text-align:center;color:var(--muted);font-size:13px;margin:5px 0;opacity:0.8;}
+.ip-bubble {width: 8px;height: 8px;border-radius: 50%;opacity: 0.55;position: absolute;bottom: 2px;border: 1px solid rgba(124,255,124,0.5);}
+.mine .ip-bubble{right:2px;}
+.other .ip-bubble,.special .ip-bubble{left:2px;}
+.tooltip{position:fixed;background:rgba(0,20,0,0.95);color:var(--text);padding:6px 10px;border:1px solid rgba(124,255,124,0.3);box-shadow:0 0 8px var(--glow);border-radius:4px;font-size:14px;white-space:nowrap;pointer-events:none;z-index:9999;display:none;}
 </style>
 </head>
 <body>
@@ -160,123 +73,137 @@ button{
   </form>
   <div class="status" id="status"></div>
 </div>
-
+<div class="tooltip" id="globalTooltip"></div>
 <script>
 const BIN_ID = "68e27f0bd0ea881f40961de3";
+const COLORS_BIN_ID = "68e3d2d0d0ea881f40975fc7";
 const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
 const POST_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
-let myIP = null;
+const COLORS_URL = `https://api.jsonbin.io/v3/b/${COLORS_BIN_ID}/latest`;
+const COLORS_POST_URL = `https://api.jsonbin.io/v3/b/${COLORS_BIN_ID}`;
 const maxMessagesPerDay = 2;
 const specialIP = "88.156.230.75";
 
+let myIP = null;
+let ipData = {};
+
 const messagesEl = document.getElementById('messages');
-const statusEl = document.getElementById('status');
 const form = document.getElementById('chatForm');
 const input = document.getElementById('messageInput');
+const tooltip = document.getElementById('globalTooltip');
 
 const today = new Date().toDateString();
-if(localStorage.getItem('lastReset') !== today){
+if(localStorage.getItem('lastReset')!==today){
   localStorage.setItem('lastReset', today);
-  localStorage.setItem('dailyCount', '0');
+  localStorage.setItem('dailyCount','0');
 }
 let dailyCount = parseInt(localStorage.getItem('dailyCount')) || 0;
 
-fetch('https://api.ipify.org?format=json')
-  .then(r=>r.json())
-  .then(d=>{ myIP=d.ip; statusEl.textContent=``; loadMessages(); })
-  .catch(()=>statusEl.textContent='Failed to detect IP');
+function randomColor(){ return '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6,'0'); }
+function randomName(){ return 'User-' + Math.floor(Math.random()*100000); }
 
-let lastMessagesLength = 0;
-
-function formatDate(date){
-  const day = String(date.getDate()).padStart(2,'0');
-  const month = date.toLocaleString('en-US', { month: 'long' });
-  const year = date.getFullYear();
-  return `${day} ${month} ${year}`;
-}
-
-function formatTime(date){
-  const h = String(date.getHours()).padStart(2,'0');
-  const m = String(date.getMinutes()).padStart(2,'0');
-  return `${h}:${m}`;
-}
-
-async function loadMessages(scrollToBottom = true){
-  const res = await fetch(API_URL);
+async function loadIPData(){
+  const res = await fetch(COLORS_URL);
   const data = await res.json();
-  const allMessages = data.record || [];
+  ipData = data.record || {};
+}
+async function saveIPData(){
+  await fetch(COLORS_POST_URL,{
+    method:"PUT",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(ipData)
+  });
+}
+
+function createIPBubble(ip){
+  const bubble = document.createElement('div');
+  bubble.className='ip-bubble';
+  bubble.style.background=ipData[ip]?.color || '#888';
+  bubble.addEventListener('mouseenter', e => {
+    tooltip.textContent=ipData[ip]?.name||'Unknown';
+    tooltip.style.display='block';
+  });
+  bubble.addEventListener('mousemove', e => {
+    tooltip.style.left=e.pageX+'px';
+    tooltip.style.top=(e.pageY-30)+'px';
+  });
+  bubble.addEventListener('mouseleave', ()=>{ tooltip.style.display='none'; });
+  return bubble;
+}
+
+function formatDate(date){ return `${String(date.getDate()).padStart(2,'0')} ${date.toLocaleString('en-US',{month:'long'})} ${date.getFullYear()}`; }
+function formatTime(date){ return `${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`; }
+
+let lastMessagesLength=0;
+async function loadMessages(scrollToBottom=true){
+  const res=await fetch(API_URL);
+  const data=await res.json();
+  const allMessages=data.record||[];
   messagesEl.innerHTML='';
+  let lastDate=null,lastMinute=null;
 
-  let lastDate = null;
-  let lastMinute = null;
+  for(const m of allMessages){
+    if(!ipData[m.ip]){
+      ipData[m.ip]={color:randomColor(),name:randomName()};
+      await saveIPData();
+    }
 
-  allMessages.forEach(m=>{
-    const msgTime = new Date(m.time || 0);
-    const msgDateStr = formatDate(msgTime);
-    const msgMinuteStr = formatTime(msgTime);
+    const msgTime=new Date(m.time||0);
+    const msgDate=formatDate(msgTime);
+    const msgMinute=formatTime(msgTime);
 
-    if(lastDate !== msgDateStr){
-      const dateDiv = document.createElement('div');
-      dateDiv.className = 'timestamp';
-      dateDiv.textContent = msgDateStr;
+    if(lastDate!==msgDate){
+      const dateDiv=document.createElement('div');
+      dateDiv.className='timestamp';
+      dateDiv.textContent=msgDate;
       messagesEl.appendChild(dateDiv);
-      lastDate = msgDateStr;
-      lastMinute = null;
+      lastDate=msgDate; lastMinute=null;
     }
-
-    if(lastMinute !== msgMinuteStr){
-      const timeDiv = document.createElement('div');
-      timeDiv.className = 'timestamp';
-      timeDiv.textContent = msgMinuteStr;
+    if(lastMinute!==msgMinute){
+      const timeDiv=document.createElement('div');
+      timeDiv.className='timestamp';
+      timeDiv.textContent=msgMinute;
       messagesEl.appendChild(timeDiv);
-      lastMinute = msgMinuteStr;
+      lastMinute=msgMinute;
     }
 
-    const div = document.createElement('div');
-    if(m.ip===specialIP) div.className='message special';
-    else if(m.ip===myIP) div.className='message mine';
+    const div=document.createElement('div');
+    if(m.ip===myIP) div.className='message mine';
+    else if(m.ip===specialIP) div.className='message special';
     else div.className='message other';
 
     if(/\.(jpeg|jpg|gif|png|webp|bmp|svg)$/i.test(m.text.trim())){
-      const link = document.createElement('a');
-      link.href = m.text.trim();
-      link.target = "_blank";
-      const img = document.createElement('img');
-      img.src = m.text.trim();
+      const link=document.createElement('a');
+      link.href=m.text.trim();
+      link.target="_blank";
+      const img=document.createElement('img');
+      img.src=m.text.trim();
       link.appendChild(img);
       div.appendChild(link);
-    } else {
-      div.textContent = m.text;
-    }
+    } else div.textContent=m.text;
 
+    const bubble=createIPBubble(m.ip);
+    div.appendChild(bubble);
     messagesEl.appendChild(div);
-  });
-
-  if(scrollToBottom && allMessages.length > lastMessagesLength){
-    messagesEl.scrollTop = messagesEl.scrollHeight;
   }
-  lastMessagesLength = allMessages.length;
+
+  if(scrollToBottom && allMessages.length>lastMessagesLength) messagesEl.scrollTop=messagesEl.scrollHeight;
+  lastMessagesLength=allMessages.length;
 }
 
 async function sendMessage(text){
   if(myIP!==specialIP && dailyCount>=maxMessagesPerDay){ alert("Daily limit reached"); return; }
 
-  const res = await fetch(API_URL);
-  const data = await res.json();
-  const allMessages = data.record || [];
-  allMessages.push({ ip: myIP || "unknown", text, time: Date.now() });
-
-  await fetch(POST_URL, {
-    method:"PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(allMessages)
-  });
-
-  if(myIP!==specialIP){ dailyCount++; localStorage.setItem('dailyCount', dailyCount); }
+  const res=await fetch(API_URL);
+  const data=await res.json();
+  const allMessages=data.record||[];
+  allMessages.push({ip:myIP||"unknown",text,time:Date.now()});
+  await fetch(POST_URL,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(allMessages)});
+  if(myIP!==specialIP){dailyCount++;localStorage.setItem('dailyCount',dailyCount);}
   loadMessages(true);
 }
 
-form.addEventListener('submit', e=>{
+form.addEventListener('submit',e=>{
   e.preventDefault();
   const text=input.value.trim();
   if(!text) return;
@@ -284,8 +211,12 @@ form.addEventListener('submit', e=>{
   input.value='';
 });
 
-// ✅ Refresh every 3 seconds, but don't scroll if user hasn't sent anything
-setInterval(()=>loadMessages(false), 3000);
+fetch('https://api.ipify.org?format=json').then(r=>r.json()).then(async d=>{
+  myIP=d.ip;
+  await loadIPData();
+  loadMessages();
+  setInterval(()=>loadMessages(false),3000);
+});
 </script>
 </body>
 </html>
