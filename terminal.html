@@ -119,7 +119,6 @@
 <script>
 (async function(){
   const BIN_ID = "68e75a5bae596e708f0b7132";
-
   const JSON_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
   let PASSWORDS = [];
 
@@ -127,6 +126,8 @@
   const input = document.getElementById('pw');
   const status = document.getElementById('status');
   const secret = document.getElementById('secret');
+
+  status.textContent = "Awaiting input…";
 
   async function sha256Hex(msg){
     const buf = new TextEncoder().encode(msg);
@@ -141,32 +142,38 @@
       if(!res.ok) throw new Error(res.status);
       const data = await res.json();
       PASSWORDS = data.record?.passwords || data.passwords || [];
-      status.textContent = `Awaiting input…`;
     } catch(err){
       status.textContent = "Failed to fetch passwords.";
       console.error(err);
     }
   }
 
-    await fetchPasswords();
-    setInterval(fetchPasswords, 5000);
+  await fetchPasswords();
+  setInterval(fetchPasswords, 5000);
 
   form.addEventListener('submit', async e=>{
     e.preventDefault();
-    const val = input.value.trim();
+    let val = input.value.trim();
     if(!val){ status.textContent = "Enter a password."; return; }
 
     status.textContent = "Checking…";
     secret.style.display = "none";
 
-    const enteredHash = await sha256Hex(val);
-    const match = PASSWORDS.find(p => p.hash === enteredHash);
+    let found = null;
+    for(const p of PASSWORDS){
+      let candidate = p.caseSensitive ? val : val.toLowerCase();
+      const enteredHash = await sha256Hex(candidate);
+      if(enteredHash === p.hash){
+        found = p;
+        break;
+      }
+    }
 
-    if(match){
-      status.textContent = "ACCESS GRANTED — revealing message:";
-      secret.textContent = atob(match.message);
+    if(found){
+      secret.textContent = atob(found.message);
       secret.style.display = "block";
-    }else{
+      status.textContent = `ACCESS GRANTED — revealing message:`;
+    } else {
       status.textContent = "ACCESS DENIED.";
     }
 
