@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Update Log - AwayFromTheTruth</title>
+<title>UpdateLog</title>
 <link rel="icon" type="image/png" href="https://63271f9dcf.cbaul-cdnwnd.com/c4628d49dde770784d90b342fc5f5b50/200000032-af4abaf4ac/HistoryLog.png">
 <style>
 :root {
@@ -18,7 +18,7 @@ html, body {
   margin: 0;
   min-height: 100vh;
   background: linear-gradient(#001200, #000800);
-  background-attachment: fixed; /* ✅ keeps gradient stationary */
+  background-attachment: fixed;
   color: var(--text);
   font-family: "VT323", "Courier New", monospace;
 }
@@ -27,7 +27,7 @@ html, body {
 body {
   display: flex;
   justify-content: center;
-  padding: 2rem 0; /* spacing when scrolling */
+  padding: 2rem 0;
 }
 
 .window {
@@ -100,7 +100,7 @@ h1 {
 
 .update .desc .line {
   display: block;
-  text-indent: var(--indent-size); /* indent only first line of each block */
+  text-indent: var(--indent-size);
   white-space: pre-wrap;
   margin-bottom: 0.2rem;
 }
@@ -129,7 +129,7 @@ a:hover {
 </div>
 
 <script>
-const BIN_ID = "68e7f6f843b1c97be9608347"; // Replace with your JSON Bin ID
+const BIN_ID = "68e7f6f843b1c97be9608347";
 const JSON_BIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
 
 function formatDescription(rawHtml = '') {
