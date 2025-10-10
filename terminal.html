@@ -6,128 +6,139 @@
 <title>AccessTerminal</title>
 <link rel="icon" type="image/png" href="https://63271f9dcf.cbaul-cdnwnd.com/c4628d49dde770784d90b342fc5f5b50/200000030-c8a08c8a09/Password.png">
 <style>
-  :root{
-    --bg:#000a00;
-    --text:#7CFF7C;
-    --muted:#4a8b4a;
-    --glow:rgba(124,255,124,0.1);
-  }
-  html,body{
-    height:100%;
-    margin:0;
-    background: linear-gradient(#001200,#000800);
-    color:var(--text);
-    font-family:"VT323","Courier New",monospace;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-  .screen{
-    width:90%;
-    max-width:800px;
-    padding:2rem;
-    border:4px solid rgba(10,40,10,0.7);
-    background:linear-gradient(180deg,rgba(0,20,0,0.9),rgba(0,10,0,0.85));
-    border-radius:8px;
-    position:relative;
-    overflow:hidden;
-    box-shadow:0 0 40px black,0 0 60px rgba(0,255,0,0.05) inset;
-  }
-  h1{text-align:center;font-size:28px;margin-top:0;text-shadow:0 0 8px var(--glow);}
-  p.lead{text-align:center;color:var(--muted);font-size:14px;}
-  form{
-    display:flex;
-    gap:10px;
-    margin-top:20px;
-    justify-content:center;
-  }
-  input{
-    flex:1;
-    max-width:300px;
-    background:transparent;
-    border:1px solid rgba(124,255,124,0.1);
-    padding:10px;
-    border-radius:4px;
-    color:var(--text);
-    font-size:16px;
-    outline:none;
-    text-align:center;
-  }
-  button{
-    background:linear-gradient(#0b3,#074);
-    color:#001;
-    border:0;
-    border-radius:4px;
-    padding:10px 14px;
-    cursor:pointer;
-    font-weight:bold;
-  }
-  .panel{
-    margin-top:20px;
-    background:rgba(0,0,0,0.2);
-    padding:12px;
-    border-radius:4px;
-    border:1px solid rgba(0,100,0,0.2);
-    min-height:70px;
-    text-align:center;
-  }
-  .status{color:var(--muted);font-size:14px;margin-bottom:8px;}
-  .secret{
-    font-size:14px;
-    white-space:pre-wrap;
-    background:linear-gradient(90deg,rgba(255,255,255,0.02),rgba(0,0,0,0.03));
-    padding:10px;
-    border-radius:4px;
-    display:none;
-  }
-
-  .screen::before{
-    content:"";position:absolute;inset:0;
-    background:linear-gradient(transparent 85%,rgba(0,0,0,0.15) 86%);
-    background-size:100% 6px;
-    animation:scan 3s linear infinite;
-    mix-blend-mode:overlay;
-    pointer-events:none;
-    opacity:0.8;
-  }
-  @keyframes scan{from{background-position-y:0;}to{background-position-y:6px;}}
-  .screen::after{
-    content:"";position:absolute;inset:0;
-    background:repeating-linear-gradient(90deg,rgba(255,255,255,0.02) 0 1px,transparent 1px 12px);
-    animation:stripes 6s linear infinite;
-    opacity:0.05;pointer-events:none;
-  }
-  @keyframes stripes{from{transform:translateX(0);}to{transform:translateX(-40px);}}
+:root{
+  --bg:#000a00;
+  --text:#7CFF7C;
+  --muted:#4a8b4a;
+  --glow:rgba(124,255,124,0.1);
+}
+html,body{
+  height:100%;
+  margin:0;
+  background: linear-gradient(#001200,#000800);
+  color:var(--text);
+  font-family:"VT323","Courier New",monospace;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.screen{
+  width:90%;
+  max-width:800px;
+  padding:2rem;
+  border:4px solid rgba(10,40,10,0.7);
+  background:linear-gradient(180deg,rgba(0,20,0,0.9),rgba(0,10,0,0.85));
+  border-radius:8px;
+  position:relative;
+  overflow:hidden;
+  box-shadow:0 0 40px black,0 0 60px rgba(0,255,0,0.05) inset;
+}
+h1{text-align:center;font-size:28px;margin-top:0;text-shadow:0 0 8px var(--glow);}
+p.lead{text-align:center;color:var(--muted);font-size:14px;}
+form{
+  display:flex;
+  gap:10px;
+  margin-top:20px;
+  justify-content:center;
+}
+input{
+  flex:1;
+  max-width:300px;
+  background:transparent;
+  border:1px solid rgba(124,255,124,0.1);
+  padding:10px;
+  border-radius:4px;
+  color:var(--text);
+  font-size:16px;
+  outline:none;
+  text-align:center;
+}
+button{
+  background:linear-gradient(#0b3,#074);
+  color:#001;
+  border:0;
+  border-radius:4px;
+  padding:10px 14px;
+  cursor:pointer;
+  font-weight:bold;
+}
+.panel{
+  margin-top:20px;
+  background:rgba(0,0,0,0.2);
+  padding:12px;
+  border-radius:4px;
+  border:1px solid rgba(0,100,0,0.2);
+  min-height:70px;
+  text-align:center;
+}
+.status{color:var(--muted);font-size:14px;margin-bottom:8px;}
+.secret{
+  font-size:14px;
+  white-space:pre-wrap;
+  background:linear-gradient(90deg,rgba(255,255,255,0.02),rgba(0,0,0,0.03));
+  padding:10px;
+  border-radius:4px;
+  display:none;
+}
+.screen::before{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(transparent 85%,rgba(0,0,0,0.15) 86%);
+  background-size:100% 6px;
+  animation:scan 3s linear infinite;
+  mix-blend-mode:overlay;
+  pointer-events:none;
+  opacity:0.8;
+}
+@keyframes scan{from{background-position-y:0;}to{background-position-y:6px;}}
+.screen::after{
+  content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,0.02) 0 1px,transparent 1px 12px);
+  animation:stripes 6s linear infinite;
+  opacity:0.05;pointer-events:none;
+}
+@keyframes stripes{from{transform:translateX(0);}to{transform:translateX(-40px);}}
 </style>
 </head>
 <body>
-  <div class="screen">
-    <h1>ACCESS TERMINAL</h1>
-    <p class="lead">Enter the access key to seek the truth</p>
+<div class="screen">
+  <h1>ACCESS TERMINAL</h1>
+  <p class="lead">Enter the access key to seek the truth</p>
 
-    <form id="form" autocomplete="off">
-      <input id="pw" type="text" placeholder="Enter password here." aria-label="password" />
-      <button type="submit">UNLOCK</button>
-    </form>
+  <form id="form" autocomplete="off">
+    <input id="pw" type="text" placeholder="Enter password here." aria-label="password" />
+    <button type="submit">UNLOCK</button>
+  </form>
 
-    <div class="panel">
-      <div id="status" class="status">Connecting to database…</div>
-      <div id="secret" class="secret"></div>
-    </div>
+  <div class="panel">
+    <div id="status" class="status">Awaiting input…</div>
+    <div id="secret" class="secret"></div>
   </div>
+</div>
 
 <script>
 (async function(){
   const BIN_ID = "68e75a5bae596e708f0b7132";
   const JSON_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
-  let PASSWORDS = [];
+
+  const DISCOVERY_BIN_ID = "68e93ec543b1c97be961d28a";
+  const DISCOVERY_URL = `https://api.jsonbin.io/v3/b/${DISCOVERY_BIN_ID}/latest`;
+  const DISCOVERY_PUT_URL = `https://api.jsonbin.io/v3/b/${DISCOVERY_BIN_ID}`;
 
   const form = document.getElementById('form');
   const input = document.getElementById('pw');
   const status = document.getElementById('status');
   const secret = document.getElementById('secret');
 
-  status.textContent = "Awaiting input…";
+  let PASSWORDS = [];
+  let myIP = null;
+
+  try{
+    const ipRes = await fetch('https://api.ipify.org?format=json');
+    const ipData = await ipRes.json();
+    myIP = ipData.ip || "unknown";
+  }catch(e){
+    myIP = "unknown";
+  }
 
   async function sha256Hex(msg){
     const buf = new TextEncoder().encode(msg);
@@ -137,49 +148,76 @@
   }
 
   async function fetchPasswords(){
-    try {
-      const res = await fetch(JSON_URL, { cache: "no-cache" });
-      if(!res.ok) throw new Error(res.status);
+    try{
+      const res = await fetch(JSON_URL);
       const data = await res.json();
       PASSWORDS = data.record?.passwords || data.passwords || [];
-    } catch(err){
-      status.textContent = "Failed to fetch passwords.";
-      console.error(err);
+    }catch(e){
+      status.textContent="Failed to fetch passwords.";
+      console.error(e);
+    }
+  }
+
+  async function recordDiscovery(description){
+    try{
+      const res = await fetch(DISCOVERY_URL);
+      const data = await res.json();
+      const discoveries = data.record || {};
+
+      if(!discoveries[description]) discoveries[description]=[];
+
+      if(!discoveries[description].some(d=>d.ip===myIP)){
+        discoveries[description].push({ip:myIP,time:new Date().toISOString()});
+        await fetch(DISCOVERY_PUT_URL,{
+          method:"PUT",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify(discoveries)
+        });
+      }
+    }catch(e){
+      console.error("Failed to record discovery", e);
     }
   }
 
   await fetchPasswords();
-  setInterval(fetchPasswords, 5000);
 
   form.addEventListener('submit', async e=>{
     e.preventDefault();
     let val = input.value.trim();
-    if(!val){ status.textContent = "Enter a password."; return; }
+    if(!val){ 
+      status.textContent="Enter a password."; 
+      return; 
+    }
 
-    status.textContent = "Checking…";
-    secret.style.display = "none";
+    status.textContent="Checking…";
+    secret.style.display="none";
 
-    let found = null;
+    let found=null;
     for(const p of PASSWORDS){
       let candidate = p.caseSensitive ? val : val.toLowerCase();
       const enteredHash = await sha256Hex(candidate);
       if(enteredHash === p.hash){
-        found = p;
+        found=p;
         break;
       }
     }
 
     if(found){
-      secret.textContent = atob(found.message);
-      secret.style.display = "block";
-      status.textContent = `ACCESS GRANTED — revealing message:`;
-    } else {
-      status.textContent = "ACCESS DENIED.";
-    }
+      input.value = "";
 
-    input.value = "";
+      secret.textContent = atob(found.message);
+      secret.style.display="block";
+      status.textContent=`ACCESS GRANTED — revealing message:`;
+
+      recordDiscovery(found.description);
+
+    }else{
+      status.textContent="ACCESS DENIED.";
+      input.value = "";
+    }
   });
 })();
 </script>
+
 </body>
 </html>
