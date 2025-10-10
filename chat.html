@@ -53,17 +53,31 @@ button{background:linear-gradient(#0b3,#074);color:#001;border:0;border-radius:4
 .message{max-width:70%;padding:8px 12px;border-radius:6px;border:1px solid rgba(124,255,124,0.1);background:rgba(0,30,0,0.4);word-break:break-word;position:relative;}
 .mine{align-self:flex-end;background:rgba(100,255,100,0.2);border-color:rgba(124,255,124,0.5);color:#B8FFB8;font-weight:bold;}
 .other{align-self:flex-start;opacity:0.85;}
-.special{align-self:flex-start;border:2px solid rgb(59, 4, 61);box-shadow:0 0 10px rgb(59, 4, 61);font-weight:bold;background:rgba(50,0,50,0.3);}
+.special{align-self:flex-start;border:2px solid #3b043d;box-shadow:0 0 10px rgb(59, 4, 61);font-weight:bold;background:rgba(50,0,50,0.3);}
 .message img{display:block;max-width:50%;border:2px solid rgba(124,255,124,0.5);border-radius:6px;margin-top:4px;box-sizing:border-box;}
 .timestamp{text-align:center;color:var(--muted);font-size:13px;margin:5px 0;opacity:0.8;}
 .ip-bubble {width: 8px;height: 8px;border-radius: 50%;opacity: 0.55;position: absolute;bottom: 2px;border: 1px solid rgba(124,255,124,0.5);}
 .mine .ip-bubble{right:2px;}
 .other .ip-bubble,.special .ip-bubble{left:2px;}
 .tooltip{position:fixed;background:rgba(0,20,0,0.95);color:var(--text);padding:6px 10px;border:1px solid rgba(124,255,124,0.3);box-shadow:0 0 8px var(--glow);border-radius:4px;font-size:14px;white-space:nowrap;pointer-events:none;z-index:9999;display:none;}
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(#001200,#000800);
+  color: var(--muted);
+  font-size: 22px;
+  font-family: "VT323","Courier New",monospace;
+  z-index: 10000;
+}
 </style>
 </head>
 <body>
-<div class="screen">
+<div id="loadingOverlay" class="loading-overlay">Loading...</div>
+
+<div class="screen" id="mainScreen">
   <h1>Public Chat</h1>
   <p class="lead">You can only send 4 messages per day!</p>
   <div class="messages" id="messages"></div>
@@ -73,7 +87,9 @@ button{background:linear-gradient(#0b3,#074);color:#001;border:0;border-radius:4
   </form>
   <div class="status" id="status"></div>
 </div>
+
 <div class="tooltip" id="globalTooltip"></div>
+
 <script>
 const BIN_ID = "68e27f0bd0ea881f40961de3";
 const COLORS_BIN_ID = "68e3d2d0d0ea881f40975fc7";
@@ -86,16 +102,19 @@ const specialIP = "88.156.230.75";
 
 let myIP = null;
 let ipData = {};
+let lastMessagesLength = 0;
+let firstLoad = true;
 
 const messagesEl = document.getElementById('messages');
 const form = document.getElementById('chatForm');
 const input = document.getElementById('messageInput');
 const tooltip = document.getElementById('globalTooltip');
+const loadingOverlay = document.getElementById('loadingOverlay');
 
 const today = new Date().toDateString();
-if(localStorage.getItem('lastReset')!==today){
+if (localStorage.getItem('lastReset') !== today) {
   localStorage.setItem('lastReset', today);
-  localStorage.setItem('dailyCount','0');
+  localStorage.setItem('dailyCount', '0');
 }
 let dailyCount = parseInt(localStorage.getItem('dailyCount')) || 0;
 
@@ -103,16 +122,22 @@ function randomColor(){ return '#' + Math.floor(Math.random()*16777215).toString
 function randomName(){ return 'User-' + Math.floor(Math.random()*100000); }
 
 async function loadIPData(){
-  const res = await fetch(COLORS_URL);
-  const data = await res.json();
-  ipData = data.record || {};
+  try {
+    const res = await fetch(COLORS_URL);
+    const data = await res.json();
+    ipData = data.record || {};
+  } catch(e){
+    ipData = {};
+  }
 }
 async function saveIPData(){
-  await fetch(COLORS_POST_URL,{
-    method:"PUT",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify(ipData)
-  });
+  try {
+    await fetch(COLORS_POST_URL,{
+      method:"PUT",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(ipData)
+    });
+  } catch(e){}
 }
 
 function createIPBubble(ip){
@@ -134,72 +159,111 @@ function createIPBubble(ip){
 function formatDate(date){ return `${String(date.getDate()).padStart(2,'0')} ${date.toLocaleString('en-US',{month:'long'})} ${date.getFullYear()}`; }
 function formatTime(date){ return `${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`; }
 
-let lastMessagesLength=0;
 async function loadMessages(scrollToBottom=true){
-  const res=await fetch(API_URL);
-  const data=await res.json();
-  const allMessages=data.record||[];
-  messagesEl.innerHTML='';
-  let lastDate=null,lastMinute=null;
+  try {
+    const res=await fetch(API_URL);
+    const data=await res.json();
+    const allMessages=data.record||[];
+    messagesEl.innerHTML='';
 
-  for(const m of allMessages){
-    if(!ipData[m.ip]){
-      ipData[m.ip]={color:randomColor(),name:randomName()};
-      await saveIPData();
+    let lastDate=null,lastMinute=null;
+    for(const m of allMessages){
+      if(!ipData[m.ip]){
+        ipData[m.ip]={color:randomColor(),name:randomName()};
+        saveIPData();
+      }
+
+      const msgTime=new Date(m.time||0);
+      const msgDate=formatDate(msgTime);
+      const msgMinute=formatTime(msgTime);
+
+      if(lastDate!==msgDate){
+        const dateDiv=document.createElement('div');
+        dateDiv.className='timestamp';
+        dateDiv.textContent=msgDate;
+        messagesEl.appendChild(dateDiv);
+        lastDate=msgDate; lastMinute=null;
+      }
+      if(lastMinute!==msgMinute){
+        const timeDiv=document.createElement('div');
+        timeDiv.className='timestamp';
+        timeDiv.textContent=msgMinute;
+        messagesEl.appendChild(timeDiv);
+        lastMinute=msgMinute;
+      }
+
+      const div=document.createElement('div');
+      if(m.ip===myIP) div.className='message mine';
+      else if(m.ip===specialIP) div.className='message special';
+      else div.className='message other';
+
+      if(/\.(jpeg|jpg|gif|png|webp|bmp|svg)$/i.test(m.text.trim())){
+        const link=document.createElement('a');
+        link.href=m.text.trim();
+        link.target="_blank";
+        const img=document.createElement('img');
+        img.src=m.text.trim();
+        link.appendChild(img);
+        div.appendChild(link);
+      } else {
+        const textSpan = document.createElement('span');
+        textSpan.textContent = m.text;
+        div.appendChild(textSpan);
+      }
+
+      const bubble=createIPBubble(m.ip);
+      div.appendChild(bubble);
+      messagesEl.appendChild(div);
     }
 
-    const msgTime=new Date(m.time||0);
-    const msgDate=formatDate(msgTime);
-    const msgMinute=formatTime(msgTime);
-
-    if(lastDate!==msgDate){
-      const dateDiv=document.createElement('div');
-      dateDiv.className='timestamp';
-      dateDiv.textContent=msgDate;
-      messagesEl.appendChild(dateDiv);
-      lastDate=msgDate; lastMinute=null;
-    }
-    if(lastMinute!==msgMinute){
-      const timeDiv=document.createElement('div');
-      timeDiv.className='timestamp';
-      timeDiv.textContent=msgMinute;
-      messagesEl.appendChild(timeDiv);
-      lastMinute=msgMinute;
+    if (firstLoad) {
+      loadingOverlay.style.display = 'none';
+      requestAnimationFrame(() => {
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      });
+      firstLoad = false;
+    } else if (scrollToBottom && allMessages.length>lastMessagesLength) {
+      messagesEl.scrollTop = messagesEl.scrollHeight;
     }
 
-    const div=document.createElement('div');
-    if(m.ip===myIP) div.className='message mine';
-    else if(m.ip===specialIP) div.className='message special';
-    else div.className='message other';
-
-    if(/\.(jpeg|jpg|gif|png|webp|bmp|svg)$/i.test(m.text.trim())){
-      const link=document.createElement('a');
-      link.href=m.text.trim();
-      link.target="_blank";
-      const img=document.createElement('img');
-      img.src=m.text.trim();
-      link.appendChild(img);
-      div.appendChild(link);
-    } else div.textContent=m.text;
-
-    const bubble=createIPBubble(m.ip);
-    div.appendChild(bubble);
-    messagesEl.appendChild(div);
+    lastMessagesLength=allMessages.length;
+  } catch(err){
+    messagesEl.innerHTML='<div class="timestamp">Failed to load messages.</div>';
+    loadingOverlay.style.display = 'none';
+    firstLoad = false;
   }
-
-  if(scrollToBottom && allMessages.length>lastMessagesLength) messagesEl.scrollTop=messagesEl.scrollHeight;
-  lastMessagesLength=allMessages.length;
 }
 
 async function sendMessage(text){
-  if(myIP!==specialIP && dailyCount>=maxMessagesPerDay){ alert("Daily limit reached"); return; }
-
   const res=await fetch(API_URL);
   const data=await res.json();
   const allMessages=data.record||[];
+
+  const todayStart=new Date(); todayStart.setHours(0,0,0,0);
+  const myMessagesToday=allMessages.filter(m=>m.ip===myIP && new Date(m.time)>=todayStart);
+
+  if(myIP!==specialIP && myMessagesToday.length>=maxMessagesPerDay){
+    alert("Daily limit reached (server)");
+    return;
+  }
+  if(myIP!==specialIP && dailyCount>=maxMessagesPerDay){
+    alert("Daily limit reached (local)");
+    return;
+  }
+
   allMessages.push({ip:myIP||"unknown",text,time:Date.now()});
-  await fetch(POST_URL,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(allMessages)});
-  if(myIP!==specialIP){dailyCount++;localStorage.setItem('dailyCount',dailyCount);}
+
+  await fetch(POST_URL,{
+    method:"PUT",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(allMessages)
+  });
+
+  if(myIP!==specialIP){
+    dailyCount++;
+    localStorage.setItem("dailyCount",dailyCount);
+  }
+
   loadMessages(true);
 }
 
@@ -211,12 +275,19 @@ form.addEventListener('submit',e=>{
   input.value='';
 });
 
-fetch('https://api.ipify.org?format=json').then(r=>r.json()).then(async d=>{
-  myIP=d.ip;
-  await loadIPData();
-  loadMessages();
-  setInterval(()=>loadMessages(false),3000);
-});
+fetch('https://api.ipify.org?format=json')
+  .then(r=>r.json())
+  .then(async d=>{
+    myIP=d.ip;
+    await loadIPData();
+    loadMessages();
+    setInterval(()=>loadMessages(false),3000);
+  })
+  .catch(async ()=>{
+    await loadIPData();
+    loadMessages();
+    setInterval(()=>loadMessages(false),3000);
+  });
 </script>
 </body>
 </html>
